@@ -16,8 +16,8 @@
 
 py_stmts(A,B,Out):-
     string_concat_list([A,"\n",B],Out).
-py_stmt(A,Out):-
-    indent_lines("\t",A,Out).			% curlly brackets
+py_stmt(A,A).
+ %% indent_lines("\t",A,Out).			% curlly brackets
 py_assign1(Var,Num,Out):-
     string_concat_list([Var,"=",Num],Out).
 
