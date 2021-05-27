@@ -58,15 +58,19 @@ nospace(O) -->
 
 %% cfg grammar
 
-stmts(Out) --> stmt(Out1) , ";", stmts(Out2),{py_stmts(Out1,Out2,Out)}.
+stmts(Out) --> stmt(Out1) , stmts(Out2),{py_stmts(Out1,Out2,Out)}.
 stmts("") --> "".
 
 stmt(Out) --> while_stmt(Out).
-stmt(Out) --> assign_stmt(Out).
+stmt(Out) --> assign_stmt(Out),";".
 stmt(Out) --> "{",stmts(Out1),"}",{py_stmt(Out1,Out)}.
 
 assign_stmt(O) --> var(V) , "=", number(X),{py_assign1(V,X,O)}.
-		   %% ,{string_concat(V,"=",V1),string_concat(V1,X,O) }. 
+assign_stmt(O) --> var(V) , "=", expr(X),{py_assign1(V,X,O)}.
+
+expr(X) --> term(A),match_list(S,["+","-","*","/","^"]),expr(E)
+	    ,{py_expr1(A,S,E,X)}.
+expr(X) --> term(X).
 
 while_stmt(O) --> "while" ,"(",cond(C),")", body(B)
 		  ,{py_while(C,B,O)}.

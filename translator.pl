@@ -6,6 +6,7 @@
 	      ,py_stmt/2
 	      ,py_assign1/3
 	      ,py_if/4
+	      ,py_expr1/4
 %%       , .....
 	  ]).
 
@@ -14,14 +15,18 @@
 	      [string_list_concat/2 as string_concat_list]).
 
 py_stmts(A,B,Out):-
-    string_concat_list([A,";",B],Out).
+    string_concat_list([A,"\n",B],Out).
 py_stmt(A,Out):-
-    string_concat_list(["{",A,"}"],Out).			% curlly brackets
+    indent_lines("\t",A,Out).			% curlly brackets
 py_assign1(Var,Num,Out):-
     string_concat_list([Var,"=",Num],Out).
 
 py_cond(T1,Op,T2,O):-
     string_concat_list([T1," ",Op," ",T2],O).
+py_expr1(T,S,E,Out):-
+    string_concat_list([T,S,E],Out).
+
+py_expr2(E1,E2,Out).
 
 py_while(Cond,Body,Out):-
     indent_lines("\t",Body,B),
