@@ -13,9 +13,12 @@
 :- use_module(prelude,
 	      [string_list_concat/2 as string_concat_list]).
 
-py_stmts(A,B,Out).
-py_stmt(A,Out).			% curlly brackets
-py_assign1(Var,Num,Out).
+py_stmts(A,B,Out):-
+    string_concat_list([A,";",B],Out).
+py_stmt(A,Out):-
+    string_concat_list(["{",A,"}"],Out).			% curlly brackets
+py_assign1(Var,Num,Out):-
+    string_concat_list([Var,"=",Num],Out).
 
 py_cond(T1,Op,T2,O):-
     string_concat_list([T1," ",Op," ",T2],O).
