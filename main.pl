@@ -1,6 +1,6 @@
 %% [cfg].				%importing doesn't work
 :- use_module(cfg).
-cpp_parser(X) --> strpc(X).	% strpc false only with phrase_from_file
+cpp_parser(X) --> topLevel(X).	% strpc false only with phrase_from_file
 
 run:- run(_).
 run(Out) :-
