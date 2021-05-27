@@ -58,14 +58,14 @@ nospace(O) -->
 
 %% cfg grammar
 
-stmts(Out) --> stmt(Out1) , ";", stmts(Out2),!.
-stmts("") --> "",!.
+stmts(Out) --> stmt(Out1) , ";", stmts(Out2),{py_stmts(Out1,Out2,Out)}.
+stmts("") --> "".
 
-stmt(Out) --> while_stmt(Out),!.
-stmt(Out) --> assign_stmt(Out),!.
-stmt(Out) --> "{",stmts(Out),"}",!.
+stmt(Out) --> while_stmt(Out).
+stmt(Out) --> assign_stmt(Out).
+stmt(Out) --> "{",stmts(Out1),"}",{py_stmt(Out1,Out)}.
 
-assign_stmt(O) --> var(V) , "=", number(X).
+assign_stmt(O) --> var(V) , "=", number(X),{py_assign1(V,X,O)}.
 		   %% ,{string_concat(V,"=",V1),string_concat(V1,X,O) }. 
 
 while_stmt(O) --> "while" ,"(",cond(C),")", body(B)
@@ -105,7 +105,7 @@ char_type_p([],L,L).
     
 %% match againest a list and returns the match
 %% order matters ,return string from the list
-match_list(H,[H|T],S,R):-
+match_list(H,[H|_],S,R):-
     phrase(H,S,R).
 match_list(H,[_|T],S,R):-
     match_list(H,T,S,R).
