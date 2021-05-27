@@ -5,7 +5,7 @@ author : mikel S. youssef
 
 
 
-%% module organization
+%% dirs
 
 :- module(cfg,
 	  [
@@ -13,8 +13,8 @@ author : mikel S. youssef
 	      ,nospace/3
 	      ,topLevel/3
 	      ]).
-
-
+:- use_module(library(dcg/basics)).
+:- use_module(translator).
 % string test
 %%  S -> abS|` `S|e
 
@@ -28,46 +28,57 @@ strpc(X) -->
     ;("" ,{  X = "" }).
 
 
-:- use_module(library(dcg/basics)).
 
-%% top level
+
+%% Top level
 % 
-topLevel (O) --> "".
+
+topLevel(O) --> nospace( Stream),{phrase(stmts(O),Stream,Rest)}.
+%% topLevel("failed")-->"",!.
 
 
+/*
+topLevel(O,S,R):-
+    nospace(O1,S,_),
+    stmts(O,O1,R).
+topLevel("failed",_,_).
+*/
 %% tokens
 nospace(O) -->
     (blank,nospace(O))
 
-    ;(nonblank(C),nospace(O1),{string_codes(S,[C]),string_concat(S,O1,O)})
+    ;(nonblank(C),nospace(O1)
+      ,{append([C],O1,O)})
 
-    ;("", { O="" }).
+    ;("", { O=[] }).
 %% alternative method 
-string_list_concat([H|T],S):-
-    string_list_concat(T,S1),
-    string_concat(H,S1,S).
-
-string_list_concat([H],S):-
-    S=H. 
 
 %split_string("ab ab\n \tdd fmf"," ","\n\t",L),string_list_concat(L,O).
 
 
 %% cfg grammar
 
-stmts(Out) --> stmt(Out1) , ";", stmts(Out2).
-stmts(Out) --> "".
+stmts(Out) --> stmt(Out1) , ";", stmts(Out2),!.
+stmts("") --> "",!.
 
-stmt(Out) --> while_stmt(Out).
-stmt(Out) --> "{",stmts(Out),"}".
+stmt(Out) --> while_stmt(Out),!.
+stmt(Out) --> assign_stmt(Out),!.
+stmt(Out) --> "{",stmts(Out),"}",!.
 
-while_stmt --> "while" ,"(",cond,")", body.
+assign_stmt(O) --> var(V) , "=", number(X).
+		   %% ,{string_concat(V,"=",V1),string_concat(V1,X,O) }. 
 
-cond --> var,bool_op,term.
-%bool_op(S) --> ("<",{S=})
+while_stmt(O) --> "while" ,"(",cond(C),")", body(B)
+		  ,{py_while(C,B,O)}.
 
-body --> stmt.
-body --> "".
+cond(O) -->
+    (match_list(O,["true","false"]))
+    ;(term(T1),bool_op(B),term(T2),{py_cond(T1,B,T2,O)}).
+bool_op(S) --> match_list(S,["<=","<",">=",">","=="]).
+term(T)--> number(T);var(T).
+
+body(O) --> stmt(O).
+body("") --> "".
 
 var(S) -->
     var_felm(F),velms(Cs),
@@ -78,7 +89,8 @@ var(S) -->
 %% it quites if wrong
 velms(S) --> var_elm(S1),velms(S2),
 	     {append([S1],S2,S)}.
-velms(S) --> "",{S=[]}.
+velms([]) --> "".
+
 %% elem
 var_elm(Char,[Char|R],R) :-
      char_type_p(Char,csym,[Char|R],R).
@@ -91,8 +103,12 @@ char_type_p(Char,Type,[Char|R],R):-
     char_type(Char,Type).
 char_type_p([],L,L).
     
-    
-    
+%% match againest a list and returns the match
+%% order matters ,return string from the list
+match_list(H,[H|T],S,R):-
+    phrase(H,S,R).
+match_list(H,[_|T],S,R):-
+    match_list(H,T,S,R).
 
 
     
