@@ -88,7 +88,7 @@ while_stmt(O) --> "while" ,"(",cond(C),")", body(B)
 		  ,{py_while(C,B,O)}.
 
 cond(O) -->
-    (match_list(O,["true","false"]))
+    (match_list(O1,["true","false"]),{py_truefalse(O1,O)})
     ;(term(T1),bool_op(B),term(T2),{py_cond(T1,B,T2,O)}).
 bool_op(S) --> match_list(S,["<=","<",">=",">","=="]).
 term(T)--> number(T);var(T).

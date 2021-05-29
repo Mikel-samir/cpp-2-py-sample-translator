@@ -10,6 +10,7 @@
 	      ,py_elseif/4
 	      ,py_else/2
 	      ,py_expr1/4
+	      ,py_truefalse/2
 %%       , .....
 	  ]).
 
@@ -17,6 +18,7 @@
 :- use_module(prelude,
 	      [string_list_concat/2 as string_concat_list
 	       ,nl/2 % conditional new line
+	       ,word_upper/2
 	      ]).
 
 py_stmts(A,B,Out):-
@@ -52,9 +54,11 @@ py_else(Body,Out):-
 
 py_doWhile(Body,Cond,Out):-
     indent_lines("\t",Body,B),
-    string_concat_list(["while(true):# fake do while\n",B
-			,"\tif ( !(",Cond,") ):\n\t\tbreak"],Out).
-
+    string_concat_list(["while(True):# fake do while\n",B
+			,"\tif ( not (",Cond,") ):\n\t\tbreak"],Out).
+py_truefalse(In,Out):-
+    word_upper(In,Out).
+    
 /** <examples>
   ?- cpp_while("x < 1","x=2\nx=5",O),write(O). 
  */

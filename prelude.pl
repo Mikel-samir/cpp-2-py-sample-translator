@@ -5,6 +5,7 @@
 	      ,list/1
 	      ,append_/3
 	      ,nl/2
+	      ,word_upper/2
 	  ]).
 
 %% general char filter
@@ -63,3 +64,12 @@ nl(In,In):-
 
 nl(In,Out):-
     string_concat(In,"\n",Out).
+
+word_upper(Word,W_ord):-
+    %% turn first char to upper
+    string_codes(Word,C),
+    C=[X|R],
+    string_codes(Y,[X]),
+    string_upper(Y,Upper),
+    string_codes(Rest,R),
+    string_concat(Upper,Rest,W_ord).
