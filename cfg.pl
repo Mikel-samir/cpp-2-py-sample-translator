@@ -59,18 +59,29 @@ nospace(O) -->
 %% cfg grammar
 
 stmts(Out) --> stmt(Out1) , stmts(Out2),{py_stmts(Out1,Out2,Out)}.
+
 stmts("") --> "".
 
 stmt(Out) --> while_stmt(Out).
+stmt(Out) --> doWhile_stmt(Out),";".
+stmt(Out) --> if_stmt(Out).
 stmt(Out) --> assign_stmt(Out),";".
-stmt(Out) --> "{",stmts(Out1),"}",{py_stmt(Out1,Out)}.
+stmt(Out) --> "{",stmts(Out),"}".
 
-assign_stmt(O) --> var(V) , "=", number(X),{py_assign1(V,X,O)}.
-assign_stmt(O) --> var(V) , "=", expr(X),{py_assign1(V,X,O)}.
 
-expr(X) --> term(A),match_list(S,["+","-","*","/","^"]),expr(E)
-	    ,{py_expr1(A,S,E,X)}.
-expr(X) --> term(X).
+if_stmt(Out) --> "if","(",cond(C),")",body(B),else_stmt(E)
+		 ,{py_if(C,B,E,Out)}.
+
+else_stmt(Out) --> "else","if","(",cond(C),")",body(B),else_stmt(E)
+		 ,{py_elseif(C,B,E,Out)}.
+
+else_stmt(Out) --> "else",body(B)
+		 ,{py_else(B,Out)}.
+else_stmt("") --> "".
+
+
+doWhile_stmt(O) --> "do", body(B),"while" ,"(",cond(C),")"
+		  ,{py_doWhile(B,C,O)}.
 
 while_stmt(O) --> "while" ,"(",cond(C),")", body(B)
 		  ,{py_while(C,B,O)}.
@@ -83,6 +94,14 @@ term(T)--> number(T);var(T).
 
 body(O) --> stmt(O).
 body("") --> "".
+
+
+assign_stmt(O) --> var(V) , "=", number(X),{py_assign1(V,X,O)}.
+assign_stmt(O) --> var(V) , "=", expr(X),{py_assign1(V,X,O)}.
+
+expr(X) --> term(A),match_list(S,["+","-","*","/","^"]),expr(E)
+	    ,{py_expr1(A,S,E,X)}.
+expr(X) --> term(X).
 
 var(S) -->
     var_felm(F),velms(Cs),
