@@ -15,6 +15,7 @@ author : mikel S. youssef
 	      ]).
 :- use_module(library(dcg/basics)).
 :- use_module(translator).
+
 % string test
 %%  S -> abS|` `S|e
 
@@ -34,7 +35,7 @@ strpc(X) -->
 % 
 
 topLevel(O) --> nospace( Stream),{phrase(stmts(O),Stream,Rest)}.
-%% topLevel("failed")-->"",!.
+
 
 
 /*
@@ -92,11 +93,10 @@ cond(O) -->
 bool_op(S) --> match_list(S,["<=","<",">=",">","=="]).
 term(T)--> number(T);var(T).
 
-body(O) --> stmt(O).
+body(O) --> stmt(O1),{py_stmt(O1,O)}.
 body("") --> "".
 
 
-assign_stmt(O) --> var(V) , "=", number(X),{py_assign1(V,X,O)}.
 assign_stmt(O) --> var(V) , "=", expr(X),{py_assign1(V,X,O)}.
 
 expr(X) --> term(A),match_list(S,["+","-","*","/","^"]),expr(E)

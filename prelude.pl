@@ -4,6 +4,7 @@
 	      ,revappend/3
 	      ,list/1
 	      ,append_/3
+	      ,nl/2
 	  ]).
 
 %% general char filter
@@ -54,3 +55,11 @@ string_list_concat([H|T],S):-
     string_concat(H,S1,S).
 string_list_concat([H],S):-
     S=H. 
+
+nl(In,In):-
+    %%  add newline if string doesn't end with new line
+    string_codes(In,Codes),
+    last(Codes,10).
+
+nl(In,Out):-
+    string_concat(In,"\n",Out).
