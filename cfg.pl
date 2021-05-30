@@ -63,8 +63,10 @@ stmts(Out) --> stmt(Out1) , stmts(Out2),{py_stmts(Out1,Out2,Out)}.
 
 stmts("") --> "".
 
+
 stmt(Out) --> while_stmt(Out).
 stmt(Out) --> doWhile_stmt(Out),";".
+stmt(Out) --> for_stmt(Out).
 stmt(Out) --> if_stmt(Out).
 stmt(Out) --> assign_stmt(Out),";".
 stmt(Out) --> "{",stmts(Out),"}".
@@ -87,6 +89,9 @@ doWhile_stmt(O) --> "do", body(B),"while" ,"(",cond(C),")"
 while_stmt(O) --> "while" ,"(",cond(C),")", body(B)
 		  ,{py_while(C,B,O)}.
 
+for_stmt(O) --> "for" ,"(", assign_stmt(S1) , ";",cond(C) ,";",assign_stmt(S2),")"
+       ,body(B) ,{py_for(S1,C,S2,B,O)}.
+
 cond(O) -->
     (match_list(O1,["true","false"]),{py_truefalse(O1,O)})
     ;(term(T1),bool_op(B),term(T2),{py_cond(T1,B,T2,O)}).
@@ -97,8 +102,19 @@ body(O) --> stmt(O1),{py_stmt(O1,O)}.
 body("") --> "".
 
 
+assign_stmt(O) --> type(_),var(V) , "=", expr(X),{py_assign1(V,X,O)}.
 assign_stmt(O) --> var(V) , "=", expr(X),{py_assign1(V,X,O)}.
 
+assign_stmt(O) --> var(V) , match_list(Sign,["++","--"])
+		   ,{py_assign2(V,Sign,"1",O)}.
+assign_stmt(O) --> match_list(Sign,["++","--"]),var(V) 
+		   ,{py_assign2(V,Sign,"1",O)}.
+
+assign_stmt(O) --> var(V) , match_list(Sign,["+=","-="]), expr(X)
+		   ,{py_assign2(V,Sign,X,O)}.
+
+type(T) --> match_list(T,["int","short","long","double","float"]).
+	    
 expr(X) --> term(A),match_list(S,["+","-","*","/","^"]),expr(E)
 	    ,{py_expr1(A,S,E,X)}.
 expr(X) --> term(X).

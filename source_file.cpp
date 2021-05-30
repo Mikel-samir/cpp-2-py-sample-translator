@@ -10,6 +10,7 @@ x=56;
 x=5+f+x;
 } else if ( y < 666 ) {y=56;}
 else if (z==66){y=555+z;}
+else if (D==66){y=555+z;}
 else do {
 x=6+5;
 } while (false);
@@ -25,4 +26,9 @@ do {
 x=6+5;
 } while (false);
 
+
+for (int i = 0; i<5;i++){
+x+=5;
+
+}
 

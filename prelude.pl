@@ -6,6 +6,7 @@
 	      ,append_/3
 	      ,nl/2
 	      ,word_upper/2
+	      ,string_head/2
 	  ]).
 
 %% general char filter
@@ -73,3 +74,8 @@ word_upper(Word,W_ord):-
     string_upper(Y,Upper),
     string_codes(Rest,R),
     string_concat(Upper,Rest,W_ord).
+
+string_head(Word,Letter):-
+    string_codes(Word,C),
+    C=[X|_],
+    char_code(Letter,X).
